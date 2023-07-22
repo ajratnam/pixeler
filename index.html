@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Pixel Viewer</title>
+    <script>
+        let image;
+
+        async function updateCanvas() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const size = await fetch('/canvas/size').then(res => res.json())
+            canvas.width = size.width;
+            canvas.height = size.height;
+            fetch('/pixel/get_all').then(async raw_data => {
+                const array = new Uint8ClampedArray(await raw_data.arrayBuffer());
+                const imArray = new Uint8ClampedArray(size.width * size.height * 4);
+                for (let i = 0, j = 0; i < array.length; i += 3, j += 4) {
+                    imArray[j] = array[i];
+                    imArray[j + 1] = array[i + 1];
+                    imArray[j + 2] = array[i + 2];
+                    imArray[j + 3] = 255;
+                }
+                const imageData = ctx.createImageData(size.width, size.height);
+                imageData.data.set(imArray);
+                ctx.putImageData(imageData, 0, 0);
+                image.src = canvas.toDataURL();
+            });
+        }
+
+        function clickWatcher(event) {
+            const rect = image.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            for (let i = x - 5; i < x + 6; i++)
+                for (let j = y - 5; j < y + 6; j++)
+                    fetch('/pixel/set', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({x: i, y: j, color: [0, 0, 255]})
+                    });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            image = document.getElementById("pixel");
+            image.addEventListener('click', clickWatcher);
+            setInterval(updateCanvas, 1000);
+        })
+    </script>
+</head>
+<body>
+<img id="pixel">
+</body>
+</html>
