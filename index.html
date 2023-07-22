@@ -29,8 +29,8 @@
 
         function clickWatcher(event) {
             const rect = image.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
+            const x = Math.round(event.clientX - rect.left);
+            const y = Math.round(event.clientY - rect.top);
             for (let i = x - 5; i < x + 6; i++)
                 for (let j = y - 5; j < y + 6; j++)
                     fetch('/pixel/set', {

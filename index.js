@@ -38,7 +38,7 @@ app.get('/pixel/get', (req, res) => {
     const {x, y} = req.query;
     if (x === undefined || y === undefined) {
         res.status(400).json({error: 'Missing parameters'});
-    } else if (!isNaN(x) || !isNaN(y)) {
+    } else if (!Number.isInteger(x) || !Number.isInteger(y)) {
         res.status(400).json({error: 'Invalid Coordinates'});
     } else if (x < 0 || x >= canvasWidth || y < 0 || y >= canvasHeight) {
         res.status(400).json({error: 'Coordinates out of bounds'});
@@ -53,13 +53,13 @@ app.post('/pixel/set', (req, res) => {
 
     if (x === undefined || y === undefined || color === undefined) {
         res.status(400).json({error: 'Missing parameters'});
-    } else if (!isNaN(x) || !isNaN(y)) {
+    } else if (!Number.isInteger(x) || !Number.isInteger(y)) {
         res.status(400).json({error: 'Invalid Coordinates'});
     } else if (!Array.isArray(color)) {
         res.status(400).json({error: 'Invalid color'});
     } else if (x < 0 || x >= canvasWidth || y < 0 || y >= canvasHeight) {
         res.status(400).json({error: 'Coordinates out of bounds'});
-    } else if (color.length !== 3 || color.some(c => isNaN(c) || c < 0 || c > 255)) {
+    } else if (color.length !== 3 || color.some(c => !Number.isInteger(c) || c < 0 || c > 255)) {
         res.status(400).json({error: 'Invalid color'});
     } else {
         canvas[y][x] = color;
