@@ -5,26 +5,24 @@
     <script>
         let image;
 
-        async function updateCanvas() {
+        function createCanvas(size) {
             const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
+            Object.assign(canvas, size);
+            return [canvas, canvas.getContext("2d")];
+        }
+
+        async function updateCanvas() {
             const size = await fetch('/canvas/size').then(res => res.json())
-            canvas.width = size.width;
-            canvas.height = size.height;
-            fetch('/pixel/get_all').then(async raw_data => {
-                const array = new Uint8ClampedArray(await raw_data.arrayBuffer());
-                const imArray = new Uint8ClampedArray(size.width * size.height * 4);
-                for (let i = 0, j = 0; i < array.length; i += 3, j += 4) {
-                    imArray[j] = array[i];
-                    imArray[j + 1] = array[i + 1];
-                    imArray[j + 2] = array[i + 2];
-                    imArray[j + 3] = 255;
-                }
-                const imageData = ctx.createImageData(size.width, size.height);
-                imageData.data.set(imArray);
-                ctx.putImageData(imageData, 0, 0);
-                image.src = canvas.toDataURL();
-            });
+            const [canvas, ctx] = createCanvas(size);
+            const raw_data = await fetch('/pixel/get_all')
+            const array = new Uint8ClampedArray(await raw_data.arrayBuffer());
+            const imArray = new Uint8ClampedArray(size.width * size.height * 4);
+            for (let i = 0, j = 0; i < array.length; i += 3, j += 4)
+                imArray.set([...array.subarray(i, i + 3), 255], j);
+            const imageData = ctx.createImageData(size.width, size.height);
+            imageData.data.set(imArray);
+            ctx.putImageData(imageData, 0, 0);
+            image.src = canvas.toDataURL();
         }
 
         function clickWatcher(event) {
@@ -50,6 +48,6 @@
     </script>
 </head>
 <body>
-<img id="pixel">
+<img id="pixel" alt="The Pixel Canvas" src="">
 </body>
 </html>
