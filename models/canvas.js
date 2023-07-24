@@ -5,7 +5,8 @@ const Canvas = {
     defaultColor: [0, 0, 0],
     resetCanvas: function() {
         this.canvas.length = 0;
-        for (let i = 0; i < this.canvasHeight; i++) this.canvas.push(new Array(this.canvasWidth).fill(this.defaultColor));
+        for (let i = 0; i < this.canvasHeight; i++)
+            this.canvas.push(new Array(this.canvasWidth).fill(this.defaultColor));
     }
 }
 

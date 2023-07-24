@@ -23,6 +23,7 @@
             imageData.data.set(imArray);
             ctx.putImageData(imageData, 0, 0);
             image.src = canvas.toDataURL();
+            setTimeout(updateCanvas, 1000)
         }
 
         function clickWatcher(event) {
@@ -43,7 +44,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             image = document.getElementById("pixel");
             image.addEventListener('click', clickWatcher);
-            setInterval(updateCanvas, 1000);
+            updateCanvas()
         })
     </script>
 </head>
