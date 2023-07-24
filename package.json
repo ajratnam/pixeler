@@ -2,13 +2,14 @@
   "name": "pixeler",
   "version": "1.0.0",
   "description": "Replica of r/place",
-  "main": "app.js",
+  "main": "express_app.js",
   "scripts": {
-    "start": "node app.js",
-    "devstart": "nodemon app.js"
+    "start": "node express_app.js",
+    "devstart": "nodemon express_app.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "socket.io": "^4.7.1"
   },
   "keywords": [
     "pixel"
