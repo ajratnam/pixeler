@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const canvas = require('../models/canvas');
+const {socket} = require('../socket_app');
 
 router.get('/get_all', (req, res) => {
     res.setHeader('Content-Type', 'application/octet-stream');
@@ -37,6 +38,7 @@ router.post('/set', (req, res) => {
     } else {
         canvas.canvas[y][x] = color;
         res.status(200).json({x: x, y: y, color: color});
+        socket.emit('pixel', {x: x, y: y, color: color});
     }
 });
 
