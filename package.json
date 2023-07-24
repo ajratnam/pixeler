@@ -4,8 +4,8 @@
   "description": "Replica of r/place",
   "main": "express_app.js",
   "scripts": {
-    "start": "node express_app.js",
-    "devstart": "nodemon express_app.js"
+    "start": "node --trace-warnings server.js",
+    "devstart": "nodemon --trace-warnings server.js"
   },
   "dependencies": {
     "express": "^4.18.2",

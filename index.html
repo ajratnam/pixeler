@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
     <title>Pixel Viewer</title>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         let image;
+        const socket = io();
 
-        function createCanvas(size) {
+        async function createCanvas() {
+            const size = await fetch('/canvas/size').then(res => res.json())
             const canvas = document.createElement("canvas");
             Object.assign(canvas, size);
-            return [canvas, canvas.getContext("2d")];
+            return [canvas, canvas.getContext("2d"), size];
         }
 
-        async function updateCanvas() {
-            const size = await fetch('/canvas/size').then(res => res.json())
-            const [canvas, ctx] = createCanvas(size);
+        async function updateCanvas(canvas, ctx, size) {
             const raw_data = await fetch('/pixel/get_all')
             const array = new Uint8ClampedArray(await raw_data.arrayBuffer());
             const imArray = new Uint8ClampedArray(size.width * size.height * 4);
@@ -23,7 +24,6 @@
             imageData.data.set(imArray);
             ctx.putImageData(imageData, 0, 0);
             image.src = canvas.toDataURL();
-            setTimeout(updateCanvas, 1000)
         }
 
         function clickWatcher(event) {
@@ -41,10 +41,20 @@
                     });
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             image = document.getElementById("pixel");
             image.addEventListener('click', clickWatcher);
-            updateCanvas()
+            const [canvas, ctx, size] = await createCanvas();
+            await updateCanvas(canvas, ctx, size);
+
+            socket.on('pixel', async (data) => {
+                const {x, y, color} = data;
+                const imageData = ctx.createImageData(1, 1);
+                imageData.data.set(color);
+                ctx.putImageData(imageData, x, y);
+                image.src = canvas.toDataURL();
+            });
+
         })
     </script>
 </head>
